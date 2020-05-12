@@ -21,7 +21,9 @@ namespace External.Program.TextEditor
         {
             FileManagement( name );
 
-            while (true)
+            bool running = true;
+
+            while (running)
             {
                 Console.SetCursorPosition( Col , Row );
 
@@ -42,11 +44,14 @@ namespace External.Program.TextEditor
 
         #region Writing
 
-        private static void OnDataReceive()
+        private static bool OnDataReceive()
         {
             ConsoleKeyInfo keyPressed = Console.ReadKey(true);
-
-            if (keyPressed.Key == ConsoleKey.Enter) //When Enter is pressed
+            if (keyPressed.Key == ConsoleKey.Escape)
+            {
+                return false;
+            }
+            else if (keyPressed.Key == ConsoleKey.Enter) //When Enter is pressed
             {
                 Enter();
             }
@@ -68,6 +73,7 @@ namespace External.Program.TextEditor
             }
             else if (keyPressed.Key == ConsoleKey.Delete) //When Delete is pressed
             {
+                Delete();
             }
             else if (keyPressed.Key == ConsoleKey.UpArrow && Row > 0) // When Up/Down Arrow is pressed
             {
@@ -85,19 +91,43 @@ namespace External.Program.TextEditor
                     Col = Text[Row].Length;
                 }
             }
-            else if (keyPressed.Key == ConsoleKey.LeftArrow) // When Left/Right Arrow is pressed
+            else if (keyPressed.Key == ConsoleKey.LeftArrow && Col > 0) // When Left/Right Arrow is pressed
             {
-                if (Col > 0)
-                {
-                    Col--;
-                }
+                Col--;
             }
-            else if (keyPressed.Key == ConsoleKey.RightArrow)
+            else if (keyPressed.Key == ConsoleKey.RightArrow && Col < Text[Row].Length)
             {
-                if (Col < Text[Row].Length)
+                Col++;
+            }
+            return true;
+        }
+
+        private static void Delete()
+        {
+            if (Col < Text[Row].Length)
+            {
+                Text[Row] = Text[Row].Remove( Col , 1 );
+                ClearRow( Row );
+                Console.SetCursorPosition( 0 , Row );
+                Console.WriteLine( Text[Row] );
+            }
+            else if (Row != UsedLines)
+            {
+                Text[Row] += Text[Row + 1];
+
+                Console.SetCursorPosition( 0 , Row );
+                Console.WriteLine( Text[Row] );
+                Text[UsedLines + 1] = "";
+
+                for (int i = Row + 1 ; i < UsedLines + 1 ; i++)
                 {
-                    Col++;
+                    Text[i] = Text[i + 1];
+                    ClearRow( i );
+                    Console.SetCursorPosition( 0 , i );
+                    Console.WriteLine( Text[i] );
                 }
+
+                UsedLines--;
             }
         }
 
