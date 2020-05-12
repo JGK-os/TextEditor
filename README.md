@@ -1,2 +1,7 @@
-# TextEditor
-Simple Console based Text Editor
+TODO
+    
+    -File Management
+    
+    -Del
+    
+    -Tab
